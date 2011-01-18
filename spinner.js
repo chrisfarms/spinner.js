@@ -48,11 +48,8 @@ var Spinner = (function() {
 	};
 	
 	Spinner.prototype.start = function(){
-		// prepend contianer to target
-		if(this.target.childNodes.length>0)
-			this.target.insertBefore(this.container,this.target.childNodes[1]);
-		else
-			this.target.appendChild(this.container);
+		// append contianer to target
+		this.target.appendChild(this.container);
 		// start animation
 		this.animate();
 	}
@@ -193,19 +190,16 @@ var Spinner = (function() {
 		// VML Rendering
 		// =======================================================================================
 		
-		var createEl = function(html,attrs){
-			var c = document.createElement('div');
-			c.innerHTML = html;
-			var el = c.childNodes[0];
+		var createEl = function(tag,attrs){
+			var el = document.createElement(tag);
 			if(attrs)
 				for(var k in attrs)
 					el.setAttribute(k,attrs[k]);
 			return el;
 		}
 		
-		var s = createEl('<shape>');
-		s.style.behavior = 'url(#default#VML)'
-		document.body.appendChild(s);
+		var s = createEl('shape',{style:'behavior:url(#default#VML);'});
+		document.getElementsByTagName('body')[0].appendChild(s);
 			
 		if (s.adj) {
 		
@@ -224,20 +218,20 @@ var Spinner = (function() {
 				var r = (innerRadius + d.length + Math.ceil(d.width / 2) + 1);
 				var s = r*2;
 				var o = -Math.ceil(s/2);
-				var el = createEl('<group>', {coordsize: s + ' ' + s, coordorigin: o + ' ' + o});
+				var el = createEl('group', {coordsize: s + ' ' + s, coordorigin: o + ' ' + o});
 				el.style.left = el.style.top = o;
 				el.style.width = el.style.height = s;
 				for (var i = 0; i < d.segments; i++) {
-					var c = createEl('<shape>', {
+					var c = createEl('shape', {
 						path: 'm ' + innerRadius + ',0  l ' + (innerRadius + d.length) + ',0',
 						style: 'width:'+s+'; height:'+s+'; rotation:'+(360 / d.segments * i) + 'deg'
 					})
 					c.appendChild(
-						createEl('<stroke>', {color: d.color, weight: d.width + 'px', endcap: 'round', opacity: this.getOpacity(i)})
+						createEl('stroke', {color: d.color, weight: d.width + 'px', endcap: 'round', opacity: this.getOpacity(i)})
 					);
 					el.appendChild(c);
 				}
-				var g = createEl('<group>', {coordsize: s + ' ' + s});
+				var g = createEl('group', {coordsize: s + ' ' + s});
 				g.style.height = g.style.width = s;
 				g.style.overflow = 'hidden';
 				g.appendChild(el);
@@ -251,7 +245,7 @@ var Spinner = (function() {
 				var duration = Math.round(10 / this.opts.speed) / 10;
 				var steps = this.opts.segments;
 				var rotation = 0;
-				var g = this.el.get(0);
+				var g = this.container.childNodes[0];
 				this.interval = setInterval(function() {
 					g.style.rotation = ++rotation % steps * (360 / steps);
 				},  duration * 1000 / steps);

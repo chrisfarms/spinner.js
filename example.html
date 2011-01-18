@@ -4,8 +4,6 @@
 	<title>spinner.js example</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-	<script type="text/javascript" charset="utf-8" src="spinner.js"></script>
-
 	<style type="text/css">
 		body {
 			color: #000;
@@ -33,7 +31,6 @@
 			var ins = document.getElementsByTagName('input');
 			for(var i=0; i<ins.length; i++)
 				options[ins[i].id] = ins[i].id=='color' ? ins[i].value : parseInt(ins[i].value);
-			console.log(options)
 			spinny = new Spinner('busy1', options);
 			spinny.start();
 		}
@@ -75,6 +72,6 @@
 	</div>
 
 
-		
+	<script type="text/javascript" charset="utf-8" src="spinner.js"></script>
 </body>
 </html>
