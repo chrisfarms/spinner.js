@@ -24,6 +24,7 @@ The plugin has been successfully tested in the following browsers:
 
 * Firefox 2+
 * Safari 3.2+
+* IE8+
 
 Dependencies
 ------------
