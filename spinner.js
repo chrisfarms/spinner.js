@@ -31,6 +31,7 @@ var Spinner = (function() {
 			this.opts[k] = opts[k];
 		// create the spinner html
 		this.container = document.createElement('div');
+		this.container.style.position = 'relative';
 		this.render();
 	};
 	
@@ -194,11 +195,12 @@ var Spinner = (function() {
 			var el = document.createElement(tag);
 			if(attrs)
 				for(var k in attrs)
-					el.setAttribute(k,attrs[k]);
+					el[k] = attrs[k];
 			return el;
 		}
 		
-		var s = createEl('shape',{style:'behavior:url(#default#VML);'});
+		var s = createEl('shape');
+		s.style.behavior = 'url(#default#VML)';
 		document.getElementsByTagName('body')[0].appendChild(s);
 			
 		if (s.adj) {
@@ -223,9 +225,10 @@ var Spinner = (function() {
 				el.style.width = el.style.height = s;
 				for (var i = 0; i < d.segments; i++) {
 					var c = createEl('shape', {
-						path: 'm ' + innerRadius + ',0  l ' + (innerRadius + d.length) + ',0',
-						style: 'width:'+s+'; height:'+s+'; rotation:'+(360 / d.segments * i) + 'deg'
+						path: 'm ' + innerRadius + ',0  l ' + (innerRadius + d.length) + ',0'
 					})
+					c.style.height = c.style.width = s;
+					c.style.rotation = (360 / d.segments * i) + 'deg';
 					c.appendChild(
 						createEl('stroke', {color: d.color, weight: d.width + 'px', endcap: 'round', opacity: this.getOpacity(i)})
 					);
