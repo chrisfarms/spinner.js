@@ -47,7 +47,7 @@ Usage
 			color: '#555'
 		});
     spinner.start(); // prepend spinner into target
-    spinner.hide(); // remove the spinner from target
+    spinner.remove(); // remove the spinner from target
 
 You may change the global defaults by modifying the `Spinner.defaults` object.
 

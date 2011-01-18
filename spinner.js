@@ -11,8 +11,8 @@
 /* 
  * usage:
  * spinner = Spinner('elementId');
- * spinner.show();
- * spinner.hide();
+ * spinner.start();
+ * spinner.remove();
  */
 
 var Spinner = (function() {
