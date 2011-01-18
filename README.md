@@ -55,5 +55,5 @@ Links
 
 * Author:  [Chris Farmiloe](http://github.com/chrisfarms)
 * License: [MIT](http://chrisfarms.github.com/MIT-LICENSE.txt)
-* Demo:    http://chrisfarms.github.com/example.html
+* Demo:    see /example.html
 
