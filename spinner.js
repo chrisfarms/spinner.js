@@ -29,8 +29,6 @@ var Spinner = (function() {
 			this.opts[k] = Spinner.defaults[k];
 		for(var k in opts)
 			this.opts[k] = opts[k];
-		// calculate color
-		this.opts.color = '#555';
 		// create the spinner html
 		this.container = document.createElement('div');
 		this.render();
@@ -45,10 +43,11 @@ var Spinner = (function() {
 		align: 'center',
 		valign: 'center',
 		padding: 4,
-		busyClass: 'busy'
+		busyClass: 'busy',
+		color: '#555'
 	};
 	
-	Spinner.prototype.show = function(){
+	Spinner.prototype.start = function(){
 		// prepend contianer to target
 		if(this.target.childNodes.length>0)
 			this.target.insertBefore(this.container,this.target.childNodes[1]);
@@ -58,7 +57,7 @@ var Spinner = (function() {
 		this.animate();
 	}
 	
-	Spinner.prototype.hide = function(){
+	Spinner.prototype.remove = function(){
 		this.inanimate();
 		this.target.removeChild(this.container);
 	}
@@ -81,6 +80,14 @@ var Spinner = (function() {
 	 * The default animation strategy does nothing as we expect an animated gif as fallback.
 	 */
 	Spinner.prototype.animate = function() {
+	};
+	
+	/**
+	 * The default animation strategy does nothing as we expect an animated gif as fallback.
+	 */
+	Spinner.prototype.inanimate = function() {
+		if(this.interval)
+			clearTimeout(this.interval);
 	};
 	
 	/**
@@ -245,9 +252,9 @@ var Spinner = (function() {
 				var steps = this.opts.segments;
 				var rotation = 0;
 				var g = this.el.get(0);
-				el.data('interval', setInterval(function() {
+				this.interval = setInterval(function() {
 					g.style.rotation = ++rotation % steps * (360 / steps);
-				},  duration * 1000 / steps));
+				},  duration * 1000 / steps);
 			};
 		}
 		document.body.removeChild(s);
