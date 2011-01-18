@@ -1,54 +1,42 @@
-/*!
- * NETEYE Activity Indicator jQuery Plugin
- *
- * Copyright (c) 2010 NETEYE GmbH
- * Licensed under the MIT license
- *
- * Author: Felix Gnass [fgnass at neteye dot de]
- * Version: @{VERSION}
- */
  
-/**
+/*
  * Plugin that renders a customisable activity indicator (spinner) using SVG or VML.
+ * Ported by [chrisfarms at gmail] from NETEYE Activity Indicator 1.0.0 
+ * Originaly written by Felix Gnass [fgnass at neteye dot de]
+ *
+ * Licensed under the MIT license
+ * 
  */
-(function($) {
 
-	$.fn.activity = function(opts) {
-		this.each(function() {
-			var $this = $(this);
-			var el = $this.data('activity');
-			if (el) {
-				clearInterval(el.data('interval'));
-				el.remove();
-				$this.removeData('activity');
-			}
-			if (opts !== false) {
-				opts = $.extend({color: $this.css('color')}, $.fn.activity.defaults, opts);
-				
-				el = render($this, opts).css('position', 'absolute').prependTo(opts.outside ? 'body' : $this);
-				var h = $this.outerHeight() - el.height();
-				var w = $this.outerWidth() - el.width();
-				var margin = {
-					top: opts.valign == 'top' ? opts.padding : opts.valign == 'bottom' ? h - opts.padding : Math.floor(h / 2),
-					left: opts.align == 'left' ? opts.padding : opts.align == 'right' ? w - opts.padding : Math.floor(w / 2)
-				};
-				var offset = $this.offset();
-				if (opts.outside) {
-					el.css({top: offset.top + 'px', left: offset.left + 'px'});
-				}
-				else {
-					margin.top -= el.offset().top - offset.top;
-					margin.left -= el.offset().left - offset.left;
-				}
-				el.css({marginTop: margin.top + 'px', marginLeft: margin.left + 'px'});
-				animate(el, opts.segments, Math.round(10 / opts.speed) / 10);
-				$this.data('activity', el);
-			}
-		});
-		return this;
+/* 
+ * usage:
+ * spinner = Spinner('elementId');
+ * spinner.show();
+ * spinner.hide();
+ */
+
+var Spinner = (function() {
+
+	var Spinner = function(target,opts) {
+		if(typeof target == 'string')
+			this.target = document.getElementById(target);
+		else
+			this.target = target;
+		if(!this.target)
+			throw new Error("Required argument 'target' missing.");
+		this.opts = {};
+		for(var k in Spinner.defaults)
+			this.opts[k] = Spinner.defaults[k];
+		for(var k in opts)
+			this.opts[k] = opts[k];
+		// calculate color
+		this.opts.color = '#555';
+		// create the spinner html
+		this.container = document.createElement('div');
+		this.render();
 	};
 	
-	$.fn.activity.defaults = {
+	Spinner.defaults = {
 		segments: 12,
 		space: 3,
 		length: 7,
@@ -56,12 +44,28 @@
 		speed: 1.2,
 		align: 'center',
 		valign: 'center',
-		padding: 4
+		padding: 4,
+		busyClass: 'busy'
 	};
 	
-	$.fn.activity.getOpacity = function(opts, i) {
-		var steps = opts.steps || opts.segments-1;
-		var end = opts.opacity !== undefined ? opts.opacity : 1/steps;
+	Spinner.prototype.show = function(){
+		// prepend contianer to target
+		if(this.target.childNodes.length>0)
+			this.target.insertBefore(this.container,this.target.childNodes[1]);
+		else
+			this.target.appendChild(this.container);
+		// start animation
+		this.animate();
+	}
+	
+	Spinner.prototype.hide = function(){
+		this.inanimate();
+		this.target.removeChild(this.container);
+	}
+	
+	Spinner.prototype.getOpacity = function(i) {
+		var steps = this.opts.steps || this.opts.segments-1;
+		var end = this.opts.opacity !== undefined ? this.opts.opacity : 1/steps;
 		return 1 - Math.min(i, steps) * (1 - end) / steps;
 	};
 	
@@ -69,27 +73,25 @@
 	 * Default rendering strategy. If neither SVG nor VML is available, a div with class-name 'busy' 
 	 * is inserted, that can be styled with CSS to display an animated gif as fallback.
 	 */
-	var render = function() {
-		return $('<div>').addClass('busy');
+	Spinner.prototype.render = function() {
+		this.container.setAttribute('class', this.opts.busyClass);
 	};
 	
 	/**
 	 * The default animation strategy does nothing as we expect an animated gif as fallback.
 	 */
-	var animate = function() {
+	Spinner.prototype.animate = function() {
 	};
 	
 	/**
 	 * Utility function to create elements in the SVG namespace.
 	 */
-	function svg(tag, attr) {
+	var svg = function(tag, attr) {
 		var el = document.createElementNS("http://www.w3.org/2000/svg", tag || 'svg');
-		if (attr) {
-			$.each(attr, function(k, v) {
-				el.setAttributeNS(null, k, v);
-			});
-		}
-		return $(el);
+		if(attr)
+			for(var k in attr)
+				el.setAttributeNS(null, k, attr[k]);
+		return el;
 	}
 	
 	if (document.createElementNS && document.createElementNS( "http://www.w3.org/2000/svg", "svg").createSVGRect) {
@@ -101,29 +103,34 @@
 		/**
 		 * Rendering strategy that creates a SVG tree.
 		 */
-		render = function(target, d) {
-			var innerRadius = d.width*2 + d.space;
-			var r = (innerRadius + d.length + Math.ceil(d.width / 2) + 1);
+		Spinner.prototype.render = function() {
+			var innerRadius = this.opts.width*2 + this.opts.space;
+			var r = (innerRadius + this.opts.length + Math.ceil(this.opts.width / 2) + 1);
 			
-			var el = svg().width(r*2).height(r*2);
+			var el = svg();
+			el.style.width = (r*2);
+			el.style.height = (r*2);
 			
 			var g = svg('g', {
-				'stroke-width': d.width, 
+				'stroke-width': this.opts.width, 
 				'stroke-linecap': 'round', 
-				stroke: d.color
-			}).appendTo(svg('g', {transform: 'translate('+ r +','+ r +')'}).appendTo(el));
+				'stroke': this.opts.color
+			});
+			var g2 = svg('g', {transform: 'translate('+ r +','+ r +')'})
+			g2.appendChild(g);
+			el.appendChild(g2)
 			
-			for (var i = 0; i < d.segments; i++) {
-				g.append(svg('line', {
+			for (var i = 0; i < this.opts.segments; i++) {
+				g.appendChild(svg('line', {
 					x1: 0, 
 					y1: innerRadius, 
 					x2: 0, 
-					y2: innerRadius + d.length, 
-					transform: 'rotate(' + (360 / d.segments * i) + ', 0, 0)',
-					opacity: $.fn.activity.getOpacity(d, i)
+					y2: innerRadius + this.opts.length, 
+					transform: 'rotate(' + (360 / this.opts.segments * i) + ', 0, 0)',
+					opacity:this.getOpacity(i)
 				}));
 			}
-			return $('<div>').append(el).width(2*r).height(2*r);
+			this.container.appendChild(el);
 		};
 				
 		// Check if Webkit CSS animations are available, as they work much better on the iPad
@@ -136,7 +143,9 @@
 			/**
 			 * Animation strategy that uses dynamically created CSS animation rules.
 			 */
-			animate = function(el, steps, duration) {
+			Spinner.prototype.animate = function(){
+				var duration = Math.round(10 / this.opts.speed) / 10;
+				var steps = this.opts.segments;
 				if (!animations[steps]) {
 					var name = 'spin' + steps;
 					var rule = '@-webkit-keyframes '+ name +' {';
@@ -150,73 +159,99 @@
 					document.styleSheets[0].insertRule(rule);
 					animations[steps] = name;
 				}
-				el.css('-webkit-animation', animations[steps] + ' ' + duration +'s linear infinite');
+				this.container.childNodes[0].style.webkitAnimation = animations[steps] + ' ' + duration +'s linear infinite';
 			};
-		}
-		else {
+		
+		
+		} else {
 		
 			/**
 			 * Animation strategy that transforms a SVG element using setInterval().
 			 */
-			animate = function(el, steps, duration) {
+			Spinner.prototype.animate = function() {
+				var duration = Math.round(10 / this.opts.speed) / 10;
+				var steps = this.opts.segments;
 				var rotation = 0;
-				var g = el.find('g g').get(0);
-				el.data('interval', setInterval(function() {
+				var g = this.container.childNodes[0].getElementsByTagName('g')[0].getElementsByTagName('g')[0];
+				this.interval = setInterval(function() {
 					g.setAttributeNS(null, 'transform', 'rotate(' + (++rotation % steps * (360 / steps)) + ')');
-				},  duration * 1000 / steps));
+				}, duration * 1000 / steps);
 			};
+			
 		}
 		
-	}
-	else {
+	} else {
 		
 		// =======================================================================================
 		// VML Rendering
 		// =======================================================================================
 		
-		var s = $('<shape>').css('behavior', 'url(#default#VML)').appendTo('body');
+		var createEl = function(html,attrs){
+			var c = document.createElement('div');
+			c.innerHTML = html;
+			var el = c.childNodes[0];
+			if(attrs)
+				for(var k in attrs)
+					el.setAttribute(k,attrs[k]);
+			return el;
+		}
+		
+		var s = createEl('<shape>');
+		s.style.behavior = 'url(#default#VML)'
+		document.body.appendChild(s);
 			
-		if (s.get(0).adj) {
+		if (s.adj) {
 		
 			// VML support detected. Insert CSS rules for group, shape and stroke.
 			var sheet = document.createStyleSheet();
-			$.each(['group', 'shape', 'stroke'], function() {
-				sheet.addRule(this, "behavior:url(#default#VML);");
-			});
+			var cRules = ['group', 'shape', 'stroke'];
+			for(var i=0; i<cRules.length; i++)
+				sheet.addRule(cRules[i], "behavior:url(#default#VML);");
 			
 			/**
 			 * Rendering strategy that creates a VML tree. 
 			 */
-			render = function(target, d) {
-			
+			Spinner.prototype.render = function() {
+				var d = this.opts;
 				var innerRadius = d.width*2 + d.space;
 				var r = (innerRadius + d.length + Math.ceil(d.width / 2) + 1);
 				var s = r*2;
 				var o = -Math.ceil(s/2);
-				
-				var el = $('<group>', {coordsize: s + ' ' + s, coordorigin: o + ' ' + o}).css({top: o, left: o, width: s, height: s});
+				var el = createEl('<group>', {coordsize: s + ' ' + s, coordorigin: o + ' ' + o});
+				el.style.left = el.style.top = o;
+				el.style.width = el.style.height = s;
 				for (var i = 0; i < d.segments; i++) {
-					el.append($('<shape>', {path: 'm ' + innerRadius + ',0  l ' + (innerRadius + d.length) + ',0'}).css({
-						width: s,
-						height: s,
-						rotation: (360 / d.segments * i) + 'deg'
-					}).append($('<stroke>', {color: d.color, weight: d.width + 'px', endcap: 'round', opacity: $.fn.activity.getOpacity(d, i)})));
+					var c = createEl('<shape>', {
+						path: 'm ' + innerRadius + ',0  l ' + (innerRadius + d.length) + ',0',
+						style: 'width:'+s+'; height:'+s+'; rotation:'+(360 / d.segments * i) + 'deg'
+					})
+					c.appendChild(
+						createEl('<stroke>', {color: d.color, weight: d.width + 'px', endcap: 'round', opacity: this.getOpacity(i)})
+					);
+					el.appendChild(c);
 				}
-				return $('<group>', {coordsize: s + ' ' + s}).css({width: s, height: s, overflow: 'hidden'}).append(el);
+				var g = createEl('<group>', {coordsize: s + ' ' + s});
+				g.style.height = g.style.width = s;
+				g.style.overflow = 'hidden';
+				g.appendChild(el);
+				this.container.appendChild(g);
 			};
 		
 			/**
 		     * Animation strategy that modifies the VML rotation property using setInterval().
 		     */
-			animate = function(el, steps, duration) {
+			Spinner.prototype.animate = function() {
+				var duration = Math.round(10 / this.opts.speed) / 10;
+				var steps = this.opts.segments;
 				var rotation = 0;
-				var g = el.get(0);
+				var g = this.el.get(0);
 				el.data('interval', setInterval(function() {
 					g.style.rotation = ++rotation % steps * (360 / steps);
 				},  duration * 1000 / steps));
 			};
 		}
-		$(s).remove();
+		document.body.removeChild(s);
 	}
 
-})(jQuery);
+	return Spinner;
+})();
