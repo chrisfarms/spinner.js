@@ -20,6 +20,12 @@
 			font-family: Helvetica, Arial, Sans-Serif;
 			float:left;
 		}
+		
+		pre {
+			background:#ccc;
+			float:left;
+			clear:both;
+		}
 	</style>
 	
 	<script>
@@ -33,6 +39,11 @@
 				options[ins[i].id] = ins[i].id=='color' ? ins[i].value : parseInt(ins[i].value);
 			spinny = new Spinner('busy1', options);
 			spinny.start();
+			// show code
+			var code = document.getElementById('code');
+			code.innerHTML = "var spinner = new Spinner(element,"+JSON.stringify(options)+");\n\
+spinner.start();\n\
+spinner.remove();"
 		}
 	</script>
 	
@@ -45,7 +56,7 @@
 			<td><input id="segments" type="range" min="3" max="15" value="12"></td>
 		</tr>
 		<tr>
-			<td>width</td>
+			<td>stroke</td>
 			<td><input id="width" type="range" min="1" max="10" value="4"></td>
 		</tr>
 		<tr>
@@ -58,7 +69,7 @@
 		</tr>
 		<tr>
 			<td>space</td>
-			<td><input id="space" type="range" min="1" max="5" value="3"></td>
+			<td><input id="space" type="range" min="0.2" step="0.2" max="5" value="3"></td>
 		</tr>
 		<tr>
 			<td>color</td>
@@ -70,6 +81,10 @@
 	<div id="busy1" class="square">
 		<!-- a target area for your spinner -->
 	</div>
+	
+	<pre id="code">
+		
+	</pre>
 
 
 	<script type="text/javascript" charset="utf-8" src="spinner.js"></script>

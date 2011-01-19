@@ -10,7 +10,7 @@
 
 /* 
  * usage:
- * spinner = Spinner('elementId');
+ * spinner = new Spinner('elementId');
  * spinner.start();
  * spinner.remove();
  */
@@ -32,6 +32,7 @@ var Spinner = (function() {
 		// create the spinner html
 		this.container = document.createElement('div');
 		this.container.style.position = 'relative';
+		this.container.className = this.opts.spinnerClass;
 		this.render();
 	};
 	
@@ -45,6 +46,7 @@ var Spinner = (function() {
 		valign: 'center',
 		padding: 4,
 		busyClass: 'busy',
+		spinnerClass: 'spinner',
 		color: '#555'
 	};
 	
