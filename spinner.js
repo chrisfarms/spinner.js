@@ -87,7 +87,7 @@ var Spinner = (function() {
 	 */
 	Spinner.prototype.inanimate = function() {
 		if(this.interval)
-			clearTimeout(this.interval);
+			clearInterval(this.interval);
 	};
 	
 	/**
