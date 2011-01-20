@@ -41,20 +41,20 @@ Usage
     <script>
 
       var options = {
-				segments: 12,           // number of 'petals'
-				space: 3,               // distance between each petal
-				length: 7,              // length of petal
-				width: 4,               // stroke size of each line
-				speed: 1.2,             // how fast it animates
-				color: '#555'           // colour of the spinner
-			};
-			
-	    var spinner = new Spinner("myElement", options);
-		
-	    spinner.start();          // append spinner into target
-
-	    spinner.remove();         // remove the spinner from target
-	
+        segments: 12,           // number of 'petals'
+        space: 3,               // distance between each petal
+        length: 7,              // length of petal
+        width: 4,               // stroke size of each line
+        speed: 1.2,             // how fast it animates
+        color: '#555'           // colour of the spinner
+      };
+    
+      var spinner = new Spinner("myElement", options);
+      
+      spinner.start();          // append spinner into target
+      
+      spinner.remove();         // remove the spinner from target
+    
     </script>
 
 You may change the global defaults by modifying the `Spinner.defaults` object.
