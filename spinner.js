@@ -42,9 +42,6 @@ var Spinner = (function() {
 		length: 7,
 		width: 4,
 		speed: 1.2,
-		align: 'center',
-		valign: 'center',
-		padding: 4,
 		busyClass: 'busy',
 		spinnerClass: 'spinner',
 		color: '#555'

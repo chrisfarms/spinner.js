@@ -34,20 +34,28 @@ None
 Usage
 -----
 
-    var spinner = new Spinner(domIdOrElement, {
-			segments: 12,
-			space: 3,
-			length: 7,
-			width: 4,
-			speed: 1.2,
-			align: 'center',
-			valign: 'center',
-			padding: 4,
-			busyClass: 'busy',
-			color: '#555'
-		});
-    spinner.start(); // prepend spinner into target
-    spinner.remove(); // remove the spinner from target
+    <div id="myElement">
+        <!-- an element to hold the spinner graphic -->
+    </div>
+
+    <script>
+
+      var options = {
+				segments: 12,           // number of 'petals'
+				space: 3,               // distance between each petal
+				length: 7,              // length of petal
+				width: 4,               // stroke size of each line
+				speed: 1.2,             // how fast it animates
+				color: '#555'           // colour of the spinner
+			};
+			
+	    var spinner = new Spinner("myElement", options);
+		
+	    spinner.start();          // append spinner into target
+
+	    spinner.remove();         // remove the spinner from target
+	
+    </script>
 
 You may change the global defaults by modifying the `Spinner.defaults` object.
 
