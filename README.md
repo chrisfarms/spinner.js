@@ -55,6 +55,6 @@ Links
 -----
 
 * Author:  [Chris Farmiloe](http://github.com/chrisfarms)
-* License: [MIT](http://chrisfarms.github.com/MIT-LICENSE.txt)
-* Demo:    see /example.html
+* License: [MIT](http://www.opensource.org/licenses/mit-license.php)
+* Demo:    [Spinner Example](http://chrisfarms.github.com/spinner/)
 
